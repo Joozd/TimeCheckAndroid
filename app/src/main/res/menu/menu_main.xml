@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_toggle_words"
+        android:title="@string/toggle_words" />
+    <item android:title="@string/lookup_timestamp"
+        android:icon="@drawable/calendar_search"
+        android:id="@+id/menu_lookup_time"
+        app:showAsAction="ifRoom"
+        />
+    <item android:title="@string/about"
+        android:id="@+id/menu_about"
+        />
+    <item android:id="@+id/menu_copy"
+        android:icon="@drawable/content_copy"
+        android:title="@string/copy"
+        app:showAsAction="always" />
+</menu>

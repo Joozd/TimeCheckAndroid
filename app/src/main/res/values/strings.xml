@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">TimeCheck</string>
+    <string name="lookup_timestamp">Get time from code</string>
+    <string name="about">About</string>
+    <string name="copy">Copy to clipboard</string>
+    <string name="toggle_words">Toggle words</string>
+
+
+    <string name="found_timestamp">Found Timestamp</string>
+
+
+    <string name="code_copied">Copied timestamp</string>
+
+
+    <string name="lookup_dialog_title">Look up time</string>
+    <string name="lookup_code_hint">Code, or words separated by commas</string>
+
+    <string name="bad_code">Code not found</string>
+    <string name="no_code">No code from server</string>
+    <string name="unknown_error">Unknown Error</string>
+
+
+
+</resources>

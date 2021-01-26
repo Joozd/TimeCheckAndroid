@@ -1,0 +1,4 @@
+include ':internetstatus'
+include ':app'
+
+rootProject.name = "TimeCheck"
