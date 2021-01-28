@@ -9,6 +9,7 @@
     <color name="gray_background">#707070</color>
 
     <color name="white">#FFFFFFFF</color>
+    <color name="white_70">#C0FFFFFF</color>
 
     <color name="dark_orannies_donker">#d16d02</color>
     <color name="dark_orannies">#d98f27</color>

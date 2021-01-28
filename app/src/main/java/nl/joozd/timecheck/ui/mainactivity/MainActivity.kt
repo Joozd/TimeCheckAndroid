@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityMainBinding.inflate(layoutInflater).apply{
+            setSupportActionBar(toolbar)
 
             viewModel.timestampCode2.observe(activity){
                 codeText2.text = it
