@@ -6,7 +6,14 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="gray_background">#707070</color>
+
     <color name="white">#FFFFFFFF</color>
+
+    <color name="dark_orannies_donker">#d16d02</color>
+    <color name="dark_orannies">#d98f27</color>
+
+
     <color name="orannies_donker">#ff7d03</color>
     <color name="orannies">#ffa230</color>
 

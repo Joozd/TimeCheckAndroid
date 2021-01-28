@@ -1,5 +1,6 @@
 package nl.joozd.timecheck.ui.mainactivity
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -46,9 +47,12 @@ class MainActivity : AppCompatActivity() {
             }
             refreshButton.setOnClickListener { viewModel.refreshClicked() }
 
+            codeText2.setOnClickListener {
+                viewModel.toggleUseWords()
+            }
+
             setContentView(root)
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -64,6 +68,15 @@ class MainActivity : AppCompatActivity() {
         else -> false
     }
 
+    /**
+     * Get a fresh code every time this is opened
+     */
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshClicked()
+    }
+
+    @SuppressLint("InflateParams")
     private fun buildLookupDialog() = AlertDialog.Builder(this).create().apply{
         DialogLookupBinding.bind(layoutInflater.inflate(R.layout.dialog_lookup, null)).apply{
             cancelButton.setOnClickListener { dismiss() }
@@ -72,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("InflateParams")
     private fun buildTimeShowerDialog(timeString: String) = AlertDialog.Builder(this).create().apply{
         DialogShowTimestampBinding.bind(layoutInflater.inflate(R.layout.dialog_show_timestamp, null)).apply{
             foundTimeTextview.text = timeString
@@ -80,9 +94,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("InflateParams")
     private fun buildAboutDialog(text: String) = AlertDialog.Builder(this).create().apply{
         DialogAboutBinding.bind(layoutInflater.inflate(R.layout.dialog_about, null)).apply {
-            println("YOLOYOLOYOLOYOLOYOLO")
             aboutTextview.movementMethod = LinkMovementMethod.getInstance()
             aboutTextview.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT)
             okButton.setOnClickListener { dismiss() }

@@ -2,9 +2,12 @@
     <!-- Base application theme. -->
     <style name="Theme.TimeCheck" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/dark_orannies_donker</item>
+        <item name="android:textColorPrimary">@color/dark_orannies</item>
+        <item name="android:textColorSecondary">@color/dark_orannies_donker</item>
+        <item name="colorPrimaryVariant">@color/dark_orannies</item>
         <item name="colorOnPrimary">@color/black</item>
+        <item name="backgroundColor">@color/gray_background</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>

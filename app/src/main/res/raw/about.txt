@@ -1,4 +1,4 @@
 <p>Made by Joozd.<br><br><br></p>
-<p>This will be open source, source cannot be found at <a href = "https://github.com/Joozd/LogbookApp">https://github.com/Joozd/LogbookApp</a><br><br><br></p>
-<p>Joozdlog uses things made by other people, most notably:<br><br>
-- <a href = "https://itextpdf.com/en">OpenTaal</a> under <a href = "https://creativecommons.org/licenses/by/3.0/legalcode">(CC BY 3.0)</a> licence<br><br>
+<p>This will be open source, source can be found at <a href = "https://github.com/Joozd/TimeCheckAndroid/">https://github.com/Joozd/TimeCheckAndroid/</a><br><br><br></p>
+<p>TimeCheck uses things made by other people, most notably:<br><br>
+- <a href = "https://www.opentaal.org/">OpenTaal</a> Nederlandse woordenlijst, under <a href = "https://creativecommons.org/licenses/by/3.0/legalcode">(CC BY 3.0)</a> licence<br><br>

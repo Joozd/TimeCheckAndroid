@@ -26,11 +26,6 @@ class MainActivityViewModel: JoozdViewModel() {
         )
     )
     private var refreshing = false
-    init{
-        viewModelScope.launch {
-            Comms.getTimeStamp()?.let { _currentTimeStampData.postValue(it)}
-        }
-    }
 
     private val _timestampCode2= MediatorLiveData<String>().apply{
         addSource(_currentTimeStampData){ _currentTimeStampData ->
@@ -62,6 +57,9 @@ class MainActivityViewModel: JoozdViewModel() {
     val timestampTime: LiveData<String> = Transformations.map(_currentTimeStampData) { epochToTimeString(it.instant) }
 
     var foundTime: String = context.getString(R.string.bad_code)
+        private set
+
+    var foundWords: String = "-\n-\n-"
         private set
 
     var aboutText: String = "ERROR"
@@ -103,11 +101,13 @@ class MainActivityViewModel: JoozdViewModel() {
         viewModelScope.launch {
             val processedCode = Repository.getInstance(context).wordsToCodeIfAble(code)
             Comms.lookUpCode(processedCode)?.let{
-                foundTime = if (it.instant == -1L) context.getString(R.string.bad_code)
-                else it.code.sliceInThree().joinToString("-") + "\n"+ epochToTimeString(it.instant)
+                foundTime = if (it.instant == -1L) code + "\n" + context.getString(R.string.bad_code)
+                else listOf(it.code.sliceInThree().joinToString("-"),
+                        Repository.getInstance(context).codeToWords(it.code).joinToString ("\n"),
+                        epochToTimeString(it.instant)
+                ).joinToString("\n\n")
                 feedback(TimeStampEvents.CODE_RECEIVED)
             }
-
         }
     }
 
@@ -142,5 +142,6 @@ class MainActivityViewModel: JoozdViewModel() {
 
     companion object{
         const val NO_CODE = "----------"
+        const val NO_WORDS = "-\n-\n-"
     }
 }

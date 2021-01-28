@@ -18,7 +18,7 @@
     <string name="bad_code">Code not found</string>
     <string name="no_code">No code from server</string>
     <string name="unknown_error">Unknown Error</string>
-
+    <string name="refresh">Refresh</string>
 
 
 </resources>
