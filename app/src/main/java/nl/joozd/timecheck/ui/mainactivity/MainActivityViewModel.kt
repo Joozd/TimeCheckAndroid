@@ -56,7 +56,19 @@ class MainActivityViewModel: JoozdViewModel() {
 
     val timestampTime: LiveData<String> = Transformations.map(_currentTimeStampData) { epochToTimeString(it.instant) }
 
+    val showingWords: LiveData<Boolean>
+        get() = _useWords
+
+    /**
+     * Time found from [checkCode]
+     */
     var foundTime: String = context.getString(R.string.bad_code)
+        private set
+
+    /**
+     * code found from [checkCode]
+     */
+    var foundCode: String = context.getString(R.string.bad_code)
         private set
 
     var foundWords: String = "-\n-\n-"
@@ -101,8 +113,9 @@ class MainActivityViewModel: JoozdViewModel() {
         viewModelScope.launch {
             val processedCode = Repository.getInstance(context).wordsToCodeIfAble(code)
             Comms.lookUpCode(processedCode)?.let{
-                foundTime = if (it.instant == -1L) code + "\n" + context.getString(R.string.bad_code)
-                else listOf(it.code.sliceInThree().joinToString("-"),
+                foundCode = it.code.sliceInThree().joinToString("-")
+                foundTime = if (it.instant == -1L) context.getString(R.string.bad_code)
+                else listOf(
                         Repository.getInstance(context).codeToWords(it.code).joinToString ("\n"),
                         epochToTimeString(it.instant)
                 ).joinToString("\n\n")

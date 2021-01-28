@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import nl.joozd.timecheck.R
 import nl.joozd.timecheck.databinding.ActivityMainBinding
@@ -21,6 +23,9 @@ import nl.joozd.timecheck.tools.FeedbackEvents.TimeStampEvents
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
     private val activity = this
+
+    private var _toggleWordsMenuItem: MenuItem? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityMainBinding.inflate(layoutInflater).apply{
@@ -34,10 +39,14 @@ class MainActivity : AppCompatActivity() {
                 timeText.text = it
             }
 
+            viewModel.showingWords.observe(activity){
+                _toggleWordsMenuItem?.icon = if (it) ContextCompat.getDrawable(activity, R.drawable.numeric) else ContextCompat.getDrawable(activity, R.drawable.alphabetical)
+            }
+
             viewModel.feedbackEvent.observe(activity){
                 when (it.getEvent()){
                     TimeStampEvents.CODE_RECEIVED ->{
-                        buildTimeShowerDialog(viewModel.foundTime).show()
+                        buildTimeShowerDialog(viewModel.foundCode, viewModel.foundTime).show()
                     }
                     TimeStampEvents.SHOW_ABOUT -> {
                         buildAboutDialog(viewModel.aboutText).show()
@@ -58,6 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        _toggleWordsMenuItem = menu.findItem(R.id.menu_toggle_words)
         return true
     }
 
@@ -82,13 +92,15 @@ class MainActivity : AppCompatActivity() {
         DialogLookupBinding.bind(layoutInflater.inflate(R.layout.dialog_lookup, null)).apply{
             cancelButton.setOnClickListener { dismiss() }
             okButton.setOnClickListener { viewModel.checkCode(inputField.text.toString()) }
+            window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             setView(root)
         }
     }
 
     @SuppressLint("InflateParams")
-    private fun buildTimeShowerDialog(timeString: String) = AlertDialog.Builder(this).create().apply{
+    private fun buildTimeShowerDialog(code: String, timeString: String) = AlertDialog.Builder(this).create().apply{
         DialogShowTimestampBinding.bind(layoutInflater.inflate(R.layout.dialog_show_timestamp, null)).apply{
+            dialogHeader.text = code
             foundTimeTextview.text = timeString
             okButton.setOnClickListener { dismiss() }
             setView(root)

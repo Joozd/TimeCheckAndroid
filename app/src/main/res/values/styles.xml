@@ -12,7 +12,7 @@
     <!-- Style for big text to draw a users attention-->
     <style name="EmphasizedText" parent="Theme.TimeCheck">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -23,6 +23,13 @@
         <item name="android:textColorSecondary">?attr/colorOnPrimary</item>
         <item name="android:background">?attr/colorPrimary</item>
     </style>
+
+    <!-- Style for Menu -->
+    <style name="Menu" parent="Theme.TimeCheck">
+        <item name="android:background">?attr/background</item>
+    </style>
+
+
 
     <style name="InputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
     </style>

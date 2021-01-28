@@ -33,7 +33,9 @@
             android:id="@+id/input_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/lookup_code_hint"/>
+            android:hint="@string/lookup_code_hint">
+            <requestFocus/>
+        </com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
