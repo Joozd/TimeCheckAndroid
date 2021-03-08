@@ -27,6 +27,31 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         tools:text="time" />
 
+    <ProgressBar
+        android:id="@+id/loadingCircle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/refreshButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeText"
+        style="?android:attr/progressBarStyle" />
+
+    <TextView
+        android:id="@+id/waiting_reason_text"
+        style="@style/EmphasizedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/waiting_for_server"
+        app:layout_constraintEnd_toEndOf="@+id/loadingCircle"
+        app:layout_constraintStart_toStartOf="@+id/loadingCircle"
+        app:layout_constraintTop_toBottomOf="@+id/loadingCircle" />
+
     <TextView
         android:id="@+id/codeText2"
         android:layout_width="0dp"

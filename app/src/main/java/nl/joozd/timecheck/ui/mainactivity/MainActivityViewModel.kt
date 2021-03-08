@@ -1,12 +1,14 @@
 package nl.joozd.timecheck.ui.mainactivity
 
-import TimeCheckProtocol.TimeStampData
+import timeCheckProtocol.TimeStampData
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
+import nl.joozd.internetstatus.InternetStatus
 import nl.joozd.timecheck.R
+import nl.joozd.timecheck.app.App
 import nl.joozd.timecheck.comms.Comms
 import nl.joozd.timecheck.data.Repository
 import nl.joozd.timecheck.tools.FeedbackEvents.TimeStampEvents
@@ -16,35 +18,41 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class MainActivityViewModel: JoozdViewModel() {
-    private var timeStampCodeJob = Job()
+    //internet status monitor
+    private val internetStatus = InternetStatus(App.instance)
+
+    // reference so it can be canbcelled and restarted when internet status changes
+    private var loadingJob: Job = Job()
+
     private val _useWords = MutableLiveData(false)
 
-    private val _currentTimeStampData = MutableLiveData(
-        TimeStampData(
-            NO_CODE,
-            0
-        )
-    )
+    private val _waitingReason = MutableLiveData(STARTING_UP)
+
+    private val _currentTimeStampData = MutableLiveData(TimeStampData.EMPTY)
+
     private var refreshing = false
 
     private val _timestampCode2= MediatorLiveData<String>().apply{
-        addSource(_currentTimeStampData){ _currentTimeStampData ->
-            if (_useWords.value == true) {
-                timeStampCodeJob.cancel()
-                viewModelScope.launch{
-                    val newValue = Repository.getInstance(context).codeToWords(_currentTimeStampData.code)
-                    if (isActive) value = newValue.joinToString("\n")
-                }
+        addSource(_currentTimeStampData){ tsdUnchecked ->
+            tsdUnchecked.takeIf{ it?.code != TimeStampData.NO_CODE}?.let { tsd ->
+                if (_useWords.value == true) {
+                    //in coroutine for loading of wordslist from raw resource
+                    viewModelScope.launch {
+                        val newValue = Repository.getInstance(context).codeToWords(tsd.code)
+                        value = newValue.joinToString("\n")
+                    }
+                } else value = tsd.code.sliceInThree().joinToString("\n")
             }
-            else value = _currentTimeStampData.code.sliceInThree().joinToString("\n")
         }
 
         addSource(_useWords){
             if (it == true) {
-                timeStampCodeJob.cancel()
+                //in coroutine for loading of wordslist from raw resource
                 viewModelScope.launch{
-                    val newValue = Repository.getInstance(context).codeToWords(_currentTimeStampData.value!!.code)
-                    if (isActive) value = newValue.joinToString("\n")
+                    val newValue = _currentTimeStampData.value.takeIf{ it?.code != TimeStampData.NO_CODE }
+                        ?.let { tsd ->
+                            Repository.getInstance(context).codeToWords(tsd.code).joinToString("\n")
+                        } ?: ""
                 }
             }
             else value = _currentTimeStampData.value!!.code.sliceInThree().joinToString("\n")
@@ -58,6 +66,14 @@ class MainActivityViewModel: JoozdViewModel() {
 
     val showingWords: LiveData<Boolean>
         get() = _useWords
+
+    val isOnLine = InternetStatus(App.instance).internetAvailableLiveData
+
+    val loading: LiveData<Boolean>
+        get() = _currentTimeStampData.map { it?.code in listOf(null, TimeStampData.NO_CODE) }
+
+    val waitingReason: LiveData<Int>
+        get() = _waitingReason
 
     /**
      * Time found from [checkCode]
@@ -79,15 +95,27 @@ class MainActivityViewModel: JoozdViewModel() {
 
 
     /**
+     * refresh if data older than TIMESTAMP_TTL
+     */
+
+    fun refreshIfTooOld(){
+        if (Instant.now().epochSecond - (_currentTimeStampData.value?.instant ?: 0) > TIMESTAMP_TTL) refreshClicked()
+    }
+
+    /**
      * Refresh timestamp from server
      */
     fun refreshClicked(){
-        println("CLICKETY CLACKETY")
+        _waitingReason.postValue( if (internetStatus.internetAvailable) WAITING_FOR_SERVER else NO_INTERNET) // refresh will always remove current data even when no nwe will be found
+        _currentTimeStampData.postValue(TimeStampData.EMPTY)
+        if (!internetStatus.internetAvailable) {
+            return
+        }
         if (!refreshing) {
-            refreshing = true
-            viewModelScope.launch {
+            refreshing = true // so it won't keep restarting on "refresh" spam
+            loadingJob = viewModelScope.launch {
                 Comms.getTimeStamp()?.let {
-                    println(it)
+                    if (!isActive) return@launch // do nothing if job was canceled
                     _currentTimeStampData.postValue(it)
                 }
                 refreshing = false
@@ -125,8 +153,8 @@ class MainActivityViewModel: JoozdViewModel() {
     }
 
     fun copyCode(){
-        val code = _currentTimeStampData.value?.code ?: NO_CODE
-        if (code == NO_CODE) {
+        val code = _currentTimeStampData.value?.code ?: TimeStampData.NO_CODE
+        if (code == TimeStampData.NO_CODE) {
             feedback(TimeStampEvents.ERROR).putString(context.getString(R.string.no_code))
             return
         }
@@ -153,8 +181,31 @@ class MainActivityViewModel: JoozdViewModel() {
         }
     }
 
+    private fun internetStatusChanged(isOnline: Boolean) {
+        if (isOnline)
+            if (_currentTimeStampData.value?.code == TimeStampData.NO_CODE) {
+                loadingJob.cancel()
+                refreshClicked()
+            }
+            // no else, we already have a code and that should do
+        else {
+            loadingJob.cancel()
+            _waitingReason.postValue(NO_INTERNET)
+            }
+    }
+
+    init{
+        internetStatus.addCallback{ isOnline ->
+            internetStatusChanged(isOnline)
+        }
+        if (!internetStatus.internetAvailable) _waitingReason.value = NO_INTERNET
+    }
+
     companion object{
-        const val NO_CODE = "----------"
-        const val NO_WORDS = "-\n-\n-"
+        const val STARTING_UP = 0
+        const val NO_INTERNET = 1
+        const val WAITING_FOR_SERVER = 2
+
+        private const val TIMESTAMP_TTL = 5*60 // seconds
     }
 }

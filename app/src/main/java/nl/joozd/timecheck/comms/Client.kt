@@ -1,6 +1,6 @@
 package nl.joozd.timecheck.comms
 
-import TimeCheckProtocol.Packet
+import timeCheckProtocol.Packet
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

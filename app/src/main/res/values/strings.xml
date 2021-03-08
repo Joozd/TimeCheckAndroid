@@ -19,6 +19,9 @@
     <string name="no_code">No code from server</string>
     <string name="unknown_error">Unknown Error</string>
     <string name="refresh">Refresh</string>
+    <string name="no_internet">Waiting for internet connection</string>
+    <string name="waiting_for_server">Waiting for server</string>
+    <string name="starting_up">Starting app</string>
 
 
 </resources>

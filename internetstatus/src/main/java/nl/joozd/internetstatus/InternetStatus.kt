@@ -34,13 +34,23 @@ class InternetStatus @RequiresPermission(ACCESS_NETWORK_STATE) constructor(conte
 
     //If you need a snapshot
     // gives null if no callback received from connectivityManager yet
-    val internetAvailable: Boolean?
-        get() = mutableInternetAvailable.value
+    val internetAvailable: Boolean
+        get() = onlineNetworks.isNotEmpty()
 
+    fun addCallback(callback: Callback){
+        registeredCallbacks.add(callback)
+    }
+
+    fun removeCallback(callback: Callback){
+        registeredCallbacks.remove(callback)
+    }
 
     /*******************************************************************************************
      * Private parts
      *******************************************************************************************/
+
+    // Registered callbacks
+    private val registeredCallbacks = mutableListOf<Callback>()
 
     // context. Can get it wherever you want, I get it from my App class
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -69,13 +79,27 @@ class InternetStatus @RequiresPermission(ACCESS_NETWORK_STATE) constructor(conte
         connectivityManager.registerNetworkCallback(request, object: ConnectivityManager.NetworkCallback(){
             override fun onAvailable(network: Network) {
                 onlineNetworks.add(network)
-                mutableInternetAvailable.postValue(onlineNetworks.isNotEmpty())
+                onlineNetworks.isNotEmpty().let { isOnline ->
+                    mutableInternetAvailable.postValue(isOnline)
+                    registeredCallbacks.forEach {
+                        it.onInternetStatusChanged(isOnline)
+                    }
+                }
             }
 
             override fun onLost(network: Network) {
                 onlineNetworks.remove(network)
-                mutableInternetAvailable.postValue(onlineNetworks.isNotEmpty())
+                onlineNetworks.isNotEmpty().let { isOnline ->
+                    mutableInternetAvailable.postValue(isOnline)
+                    registeredCallbacks.forEach {
+                        it.onInternetStatusChanged(isOnline)
+                    }
+                }
             }
         })
+    }
+
+    fun interface Callback{
+        fun onInternetStatusChanged(online: Boolean)
     }
 }

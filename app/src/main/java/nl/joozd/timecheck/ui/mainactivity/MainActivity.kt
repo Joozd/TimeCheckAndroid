@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -41,6 +42,23 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.showingWords.observe(activity){
                 _toggleWordsMenuItem?.icon = if (it) ContextCompat.getDrawable(activity, R.drawable.numeric) else ContextCompat.getDrawable(activity, R.drawable.alphabetical)
+            }
+
+            viewModel.waitingReason.observe(activity){
+                waitingReasonText.text = getString(when(it){
+                    MainActivityViewModel.WAITING_FOR_SERVER -> R.string.waiting_for_server
+                    MainActivityViewModel.NO_INTERNET -> R.string.no_internet
+                    MainActivityViewModel.STARTING_UP -> R.string.starting_up // don't think this will be shown but might as well put it here
+                    else -> R.string.unknown_error
+                })
+            }
+
+            viewModel.loading.observe(activity){ loading ->
+                val waiting = if (loading) View.VISIBLE else View.INVISIBLE
+                val result = if (loading) View.INVISIBLE else View.VISIBLE
+                    loadingCircle.visibility = waiting
+                    waitingReasonText.visibility = waiting
+                    codeText2.visibility = result
             }
 
             viewModel.feedbackEvent.observe(activity){
@@ -84,7 +102,7 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onResume() {
         super.onResume()
-        viewModel.refreshClicked()
+        viewModel.refreshIfTooOld()
     }
 
     @SuppressLint("InflateParams")
