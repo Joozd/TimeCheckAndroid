@@ -13,6 +13,7 @@ import java.net.SocketException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLSocketFactory
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class Client: Closeable {
     private val socket = try {
         SSLSocketFactory.getDefault().createSocket(
@@ -27,7 +28,6 @@ class Client: Closeable {
 
     /**
      * Send data to server. On success, returns the amount of bytes sent, on failure returns a negative Integer
-     * TODO define return codes in [CloudFunctionResults]
      */
     suspend fun sendToServer(packet: Packet): Int {
         println("sending ${packet.payload.size} bytes")
@@ -104,7 +104,6 @@ class Client: Closeable {
         const val SERVER_URL = "joozd.nl"
         const val SERVER_PORT = 13337
         const val TAG = "comm.protocol.Client"
-        const val MAX_MESSAGE_SIZE = Int.MAX_VALUE - 1
 
         /**
          * Returns an open instance if it is available
