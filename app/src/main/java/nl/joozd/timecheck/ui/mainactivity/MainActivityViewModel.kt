@@ -45,11 +45,11 @@ class MainActivityViewModel: JoozdViewModel() {
             }
         }
 
-        addSource(_useWords){
-            if (it == true) {
+        addSource(_useWords){ useWords ->
+            if (useWords == true) {
                 //in coroutine for loading of wordslist from raw resource
                 viewModelScope.launch{
-                    val newValue = _currentTimeStampData.value.takeIf{ it?.code != TimeStampData.NO_CODE }
+                    value = _currentTimeStampData.value.takeIf{ it?.code != TimeStampData.NO_CODE }
                         ?.let { tsd ->
                             Repository.getInstance(context).codeToWords(tsd.code).joinToString("\n")
                         } ?: ""
